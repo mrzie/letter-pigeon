@@ -1,0 +1,91 @@
+.display-flex(@display: flex) {
+    & when (@display=flex) {
+        display: -webkit-box;
+    }
+    & when (@display=inline-flex) {
+        display: -webkit-inline-box;
+    }
+    display: e("-webkit-@{display}");
+    display: @display;
+}
+
+.flex-direction(@direction) {
+    & when (@direction=row) {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+    }
+    & when (@direction=row-reverse) {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: reverse;
+    }
+    & when (@direction=column) {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+    }
+    & when (@direction=column-reverse) {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: reverse;
+    }
+    -webkit-flex-direction: @direction;
+    flex-direction: @direction;
+}
+
+.flex-wrap(@wrap) {
+    & when (@wrap=nowrap) {
+        -webkit-box-lines: single;
+    }
+    & when (@wrap=wrap) {
+        -webkit-box-lines: multiple;
+    }
+    -webkit-flex-wrap: @wrap;
+    flex-wrap: @wrap;
+}
+
+.justify-content(@justify-content) {
+    & when (@justify-content=flex-start) {
+        -webkit-box-pack: start;
+    }
+    & when (@justify-content=flex-end) {
+        -webkit-box-pack: end;
+    }
+    & when (@justify-content=center) {
+        -webkit-box-pack: center;
+    }
+    & when (@justify-content=space-between) {
+        -webkit-box-pack: justify;
+    }
+    -webkit-justify-content: @justify-content;
+    justify-content: @justify-content;
+}
+
+.align-items(@align-items) {
+    & when (@align-items=flex-start) {
+        -webkit-box-align: start;
+    }
+    & when (@align-items=flex-end) {
+        -webkit-box-align: end;
+    }
+    & when (@align-items=center) {
+        -webkit-box-align: center;
+    }
+    & when (@align-items=baseline) {
+        -webkit-box-align: baseline;
+    }
+    & when (@align-items=stretch) {
+        -webkit-box-align: stretch;
+    }
+    -webkit-align-items: @align-items;
+    align-items: @align-items;
+}
+
+.order(@order) {
+    -webkit-box-ordinal-group: @order;
+    -webkit-order: @order;
+    order: @order;
+}
+
+.flex(@flex) {
+    -webkit-box-flex: @flex;
+    -webkit-flex: @flex;
+    flex: @flex;
+}

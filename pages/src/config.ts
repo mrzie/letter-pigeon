@@ -1,0 +1,1 @@
+export const wsPath = `ws://${location.host}/ws`

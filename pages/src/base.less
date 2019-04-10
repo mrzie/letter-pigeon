@@ -1,0 +1,13 @@
+@import './flex.less';
+
+body {
+    margin: 0;
+    height: 100%;
+}
+
+.flex-container(@direction: row, @justify-content: center, @align-items: center) {
+    .display-flex;
+    .flex-direction(@direction);
+    .justify-content(@justify-content);
+    .align-items(@align-items);
+}
