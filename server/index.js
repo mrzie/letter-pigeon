@@ -78,13 +78,15 @@ wss.on('connection', (ws, req) => {
                         broadcast({
                             type: 'document',
                             content: { msgType, text },
-                            from: { msgId, name }
+                            from: { msgId, name },
+                            time: +new Date(),
                         })
                     } else if (msgType === 'img' && typeof base64 === 'string') {
                         broadcast({
                             type: 'document',
                             content: { msgType, base64 },
-                            from: { msgId, name }
+                            from: { msgId, name },
+                            time: +new Date(),
                         })
                     }
                 }

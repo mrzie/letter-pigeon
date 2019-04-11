@@ -2,11 +2,13 @@ export interface Document extends Message {
     type: 'document',
     content: TextDocument | ImgDocument,
     from: TerminalInfo,
+    isTemp?: boolean,
+    time?:number,
 }
 
 export interface TerminalInfo {
     name: string,
-    msgId: number,
+    msgId: string,
 }
 
 export enum MsgType {
@@ -40,7 +42,6 @@ export interface Message {
 
 
 export type MessageType = 'document' | 'operation'
-
 
 export const MessageTypes: MessageType[] = ['document', 'operation']
 

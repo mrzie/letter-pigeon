@@ -30,14 +30,21 @@ const MainView = () => {
 
     const context$ = useMemo(() => ({
         state$,
-        send: msg => ws.send(msg)
+        send: msg => {
+            addMessageToList({
+                ...msg,
+                time: +new Date(),
+                isTemp: true,
+            })
+            ws.send(msg)
+        }
     }) as PigeonContextType, [])
 
     const addMessageToList = useCallback((doc: Document) => reduceState(
         state$,
         state => ({
             ...state,
-            list: [...state.list, doc]
+            list: [...state.list.filter(item => (item.from.name !== doc.from.name) || (item.from.msgId !== doc.from.msgId)), doc]
         })
     ), [])
 

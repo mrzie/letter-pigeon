@@ -12,4 +12,4 @@ const getArg = (name, argv = process.argv) => {
     return false
 }
 
-module.exports = + (getArg('--port') || getArg('-p' || defaultPort))
+module.exports = + (getArg('--port') || getArg('-p') || defaultPort)
