@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "webpack-dev-server --mode development",
     "build": "webpack --env.production --mode production",
-    "start": "sudo node server/index.js"
+    "start": "node server/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,8 @@
     "ws": "^6.2.1"
   },
   "devDependencies": {},
-  "homepage": "https://github.com/mrzie/letter-pigeon#readme"
+  "homepage": "https://github.com/mrzie/letter-pigeon#readme",
+  "bin": {
+    "pigeon-start": "./server/pigeon-start.js"
+  }
 }
