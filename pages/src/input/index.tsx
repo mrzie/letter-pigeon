@@ -3,7 +3,7 @@ import { useContext, useCallback, useRef, useMemo } from 'react'
 import * as styles from './input.less'
 import PigeonContext from '../context'
 import { useObservable, useEventHandler, useListener } from 'fugo';
-import { pluck, tap, map, filter, mapTo, startWith } from 'rxjs/operators';
+import { pluck, tap, map, filter, mapTo, startWith, withLatestFrom } from 'rxjs/operators';
 import { fromEvent, merge, combineLatest } from 'rxjs';
 
 let count = 0
@@ -54,7 +54,8 @@ const InputView = () => {
             )
         )
 
-        const cmdEnter$ = combineLatest(enterKey$, cmdKey$).pipe(
+        const cmdEnter$ = enterKey$.pipe(
+            withLatestFrom(cmdKey$),
             map(([enterPressed, cmdPressed]) => enterPressed && cmdPressed),
             filter(cool => cool)
         )
@@ -136,8 +137,18 @@ const InputView = () => {
 
 
     return <div className={styles.container}>
-        <label htmlFor={inputId} className={styles.iconAdd} onClick={() => inputRef.current.focus()}></label>
-        <input type="file" ref={inputRef} id={inputId} className={styles.hide} onChange={onFileChange} />
+        <label
+            htmlFor={inputId}
+            className={styles.iconAdd}
+            onClick={() => inputRef.current.focus()}
+        ></label>
+        <input type="file"
+            ref={inputRef}
+            id={inputId}
+            className={styles.hide}
+            onChange={onFileChange}
+            accept="image/*"
+        />
         <textarea
             ref={textRef}
             className={styles.textarea}
