@@ -5,7 +5,7 @@
 ## 安装
 
 ```
-npm install -g http://git@github.com/mrzie/letter-pigeon
+npm install -g https://github.com/mrzie/letter-pigeon.git
 ```
 
 ## 使用
