@@ -6,9 +6,8 @@ const
     send = require('koa-send'),
     domain = require('./getIp')
 
-const port = 5387
+const port = require('./getPort')
 const app = new Koa()
-var qrcode = require('qrcode-terminal');
 
 const sessionKey = + new Date()
 const generateId = (id => () => id++)(0)
@@ -79,13 +78,15 @@ wss.on('connection', (ws, req) => {
                         broadcast({
                             type: 'document',
                             content: { msgType, text },
-                            from: { msgId, name }
+                            from: { msgId, name },
+                            time: +new Date(),
                         })
                     } else if (msgType === 'img' && typeof base64 === 'string') {
                         broadcast({
                             type: 'document',
                             content: { msgType, base64 },
-                            from: { msgId, name }
+                            from: { msgId, name },
+                            time: +new Date(),
                         })
                     }
                 }
@@ -101,7 +102,7 @@ const pathToOpen = `http://${domain}:${port}`
 
 console.log(`app run in ${pathToOpen} \n\n`)
 console.log('扫描下方二维码进入：\n\n')
-qrcode.generate(pathToOpen)
+require('qrcode-terminal').generate(pathToOpen)
 
 
 require('./openUrl')(pathToOpen)

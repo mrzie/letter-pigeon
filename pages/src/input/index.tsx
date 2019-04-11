@@ -13,7 +13,7 @@ let inputCount = 0
 const InputView = () => {
     const { state$, send } = useContext(PigeonContext)
 
-    const terminalName = useObservable(() => state$.pipe(
+    const terminalName$ = useMemo(() => state$.pipe(
         map(state => {
             try {
                 return state.terminal.name
@@ -21,7 +21,9 @@ const InputView = () => {
                 return null
             }
         }),
-    ), null)
+    ), [])
+
+    const terminalName = useObservable(() => terminalName$, null)
 
     const textRef = useRef(null as HTMLTextAreaElement)
 
@@ -68,7 +70,7 @@ const InputView = () => {
             submit$,
             cmdEnter$,
             ctrlEnter$
-        ).subscribe(() => {
+        ).pipe(withLatestFrom(terminalName$)).subscribe(([, terminalName]) => {
 
             try {
                 if (textRef.current.value.trim() === '') {
@@ -82,7 +84,7 @@ const InputView = () => {
                     },
                     from: {
                         name: terminalName,
-                        msgId: ++count
+                        msgId: `${+new Date()}.${++count}`
                     }
                 })
                 textRef.current.value = ''
@@ -95,7 +97,7 @@ const InputView = () => {
     const [onParse, parse$] = useEventHandler<React.ClipboardEvent<HTMLTextAreaElement>>()
 
     // 粘贴上传
-    useListener(() => parse$.subscribe(e => {
+    useListener(() => parse$.pipe(withLatestFrom(terminalName$)).subscribe(([e, terminalName]) => {
         const items = [...e.clipboardData.items]
         if (items.find(item => item.type.includes('image'))) {
             e.preventDefault()
@@ -108,14 +110,14 @@ const InputView = () => {
                     },
                     from: {
                         name: terminalName,
-                        msgId: ++count,
+                        msgId: `${+new Date()}.${++count}`,
                     }
                 })
             })
         }
     }))
     const [onFileChange, fileChange$] = useEventHandler<React.ChangeEvent<HTMLInputElement>>()
-    useListener(() => fileChange$.subscribe(e => {
+    useListener(() => fileChange$.pipe(withLatestFrom(terminalName$)).subscribe(([e, terminalName]) => {
         const files = [...e.target.files]
         files.filter(f => f.type.includes('image')).forEach(async f => {
             send({
@@ -126,7 +128,7 @@ const InputView = () => {
                 },
                 from: {
                     name: terminalName,
-                    msgId: ++count,
+                    msgId: `${+new Date()}.${++count}`,
                 }
             })
         })

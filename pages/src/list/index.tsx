@@ -39,10 +39,12 @@ const ListView = () => {
 
     return <div className={styles.container} ref={rootRef} >
         {
-            list.map((doc, index) => <DocumentItem
+            list.sort((a, b) => a.time > b.time ? 1 : -1).map((doc, index) => <DocumentItem
                 msg={doc.content}
+                from={doc.from.name}
                 isSelf={doc.from.name === selfName}
                 key={index}
+                isTemp={doc.isTemp}
             />
             )
         }
@@ -52,14 +54,19 @@ const ListView = () => {
 interface DocumentItemProps {
     msg: TextDocument | ImgDocument,
     isSelf: boolean,
+    from: string,
+    isTemp: boolean,
 }
 
 const DocumentItem = (props: DocumentItemProps) => {
-    const { msg, isSelf } = props
+    const { msg, isSelf, isTemp } = props
     const css = [styles.item]
 
     if (isSelf) {
         css.push(styles.fromSelf)
+    }
+    if (isTemp) {
+        css.push(styles.tempDoc)
     }
     if (msg.msgType === 'text') {
 

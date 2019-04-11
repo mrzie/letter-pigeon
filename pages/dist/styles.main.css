@@ -142,6 +142,21 @@
   max-width: 50vw;
   max-height: 50vh;
 }
+.Fb_HA3m9zdm-HFU4JgvGR {
+  animation-name: _2UEyO_YHkV3JNRMYNzA8b3;
+  animation-duration: 500ms;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+@keyframes _2UEyO_YHkV3JNRMYNzA8b3 {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
 
 ._3SK86DBit6SNP3dSAF76YP {
   display: flex;
