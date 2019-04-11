@@ -4,14 +4,14 @@ const
     Koa = require('koa'),
     route = require('koa-route'),
     send = require('koa-send'),
-    session = require('koa-session'),
     domain = require('./getIp')
 
 const port = 5387
 const app = new Koa()
 var qrcode = require('qrcode-terminal');
 
-const generateId = (id => () => id++)(1)
+const sessionKey = + new Date()
+const generateId = (id => () => id++)(0)
 
 const staticRoot = path.resolve(__dirname, '../pages/dist')
 
@@ -21,14 +21,15 @@ app.use(route.all('/static/*', async ctx => {
     await send(ctx, ctx.path.replace(/^\/static\//, ''), { root: staticRoot })
 }))
 
-const useSession = session(app)
-
-app.use(useSession)
+const session = {}
 
 app.use(async (ctx, next) => {
-    if (!ctx.session.name) {
-        ctx.session.name = '终端' + generateId()
-
+    let cookieName = ctx.cookies.get('name')
+    if (!cookieName || !session[cookieName]) {
+        const id = generateId()
+        cookieName = `${sessionKey}.${id}`
+        session[cookieName] = `设备${id}`
+        ctx.cookies.set('name', cookieName, {signed: true})
     }
     await next()
 })
@@ -52,14 +53,12 @@ const broadcast = value => {
 
 wss.on('connection', (ws, req) => {
     const ctx = app.createContext(req, {})
-    // console.log('upgrade', ctx.session.name)
-    const name = ctx.session.name
+    const name = session[ctx.cookies.get('name')]
 
     const send = value => ws.send(JSON.stringify(value))
 
 
     if (!name) {
-        // ws.close()
         ws.send('none name')
     } else {
         send({
