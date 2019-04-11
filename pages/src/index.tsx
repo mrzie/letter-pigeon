@@ -3,12 +3,13 @@ import { render } from 'react-dom'
 import { useListener } from 'fugo'
 import { fromEvent } from 'rxjs'
 import MainView from './main';
+import './index.less'
 // import t,{a} from './test'
 
-const App = () => <div>
-    {/* <Demo />  */}
-    <MainView />
-</div>
+// const App = () => <div>
+//     {/* <Demo />  */}
+//     <MainView />
+// </div>
 
 const Demo = () => {
     useListener(() => {
@@ -29,6 +30,6 @@ const Demo = () => {
 }
 
 render(
-    <App />,
+    <MainView />,
     document.getElementById('app')
 )
