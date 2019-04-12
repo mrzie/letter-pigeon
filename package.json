@@ -54,6 +54,6 @@
   },
   "homepage": "https://github.com/mrzie/letter-pigeon#readme",
   "bin": {
-    "pigeon": "./server/pigeon-start.js"
+    "pigeon": "./server/pigeon-cli.js"
   }
 }
