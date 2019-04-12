@@ -4,6 +4,6 @@ const { argv } = process
 
 let port;
 
-const getArg = require('./getArg')
+const { getSomeArg } = require('./getArg')
 
-module.exports = + (getArg('--port') || getArg('-p') || defaultPort)
+module.exports = + getSomeArg('--port', '-p') || defaultPort

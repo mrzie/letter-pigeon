@@ -1,18 +1,65 @@
 #!/usr/bin/env node
-const { argv } = process
+const { argsMatch, commandMatch } = require('./getArg')
+
+
+const showHelp = () => {
+    const buildLine = (cmd, desc) => ('  ' + cmd).padEnd(26, ' ') + desc
+    const msgs = [
+        '',
+        "Usages: pigeon <command>",
+        '',
+        buildLine('start', '启动服务'),
+        buildLine('start -p xxxx', '启动并指定端口xxxx'),
+        buildLine('update', '更新版本'),
+        buildLine('-h, --help', '显示命令帮助'),
+        buildLine('-v, --version', '查看当前版本'),
+        '',
+        '',
+        'https://github.com/mrzie/letter-pigeon',
+        '',
+    ]
+
+    const msg = msgs.join('\n')
+
+    console.log(msg)
+}
+
+const exclusiveCommands = [
+    {
+        match: ['start'],
+        handler: () => {
+
+            require('./index')
+            checkVersion().catch(e => void (0))
+        }
+    },
+    {
+        match: ['update'],
+        handler: () => {
+            require('child_process').exec('npm install -g https://github.com/mrzie/letter-pigeon.git')
+        }
+    },
+    {
+        match: ['--help', '-h'],
+        handler: showHelp,
+    },
+    {
+        match: ['--version', '-v'],
+        handler: () => {
+            console.log(require('../package.json').version)
+        },
+    },
+]
 
 const main = () => {
-    if (argv.includes('--help') || argv.includes('-h')) {
-        console.log('不要皮 =_=\n')
-    } else if (argv.includes('--version') || argv.includes('-v')) {
-        const packageJson = require('../package.json')
-        console.log(`当前版本：\n${packageJson.version}\n`)
-    } else {
-        require('./index')
-
-
-        checkVersion().catch(e => void (0))
+    for (const { match, handler } of exclusiveCommands) {
+        if (commandMatch(match)) {
+            handler()
+            return
+        }
     }
+
+    showHelp()
 }
 
 const checkVersion = async () => {
@@ -26,7 +73,7 @@ const checkVersion = async () => {
 
         msg += local.version + "  ->  \033[32m" + remote.version + "\033[0m\n\n"
 
-        msg += "建议安装新版本： npm install -g https://github.com/mrzie/letter-pigeon.git\n\n"
+        msg += "建议安装新版本： pigeon update"
 
 
         console.log(msg)
