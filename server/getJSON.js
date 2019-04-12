@@ -28,12 +28,12 @@ const getFile = path => new Promise((resolve, reject) => {
     })
 })
 
-const getFileJSON = async path => {
-    const raw = await getFile(path)
-    return JSON.parse(raw)
-}
+// const getFileJSON = async path => {
+//     const raw = await getFile(path)
+//     return JSON.parse(raw)
+// }
 
 module.exports = {
     getRemoteJSON,
-    getFileJSON,
+    // getFileJSON,
 }
