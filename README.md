@@ -15,9 +15,10 @@ npm install -g https://github.com/mrzie/letter-pigeon.git
 
 ## 使用
 ```
-pigeon-start
+pigeon start
 ```
-或者
+
+查看帮助
 ```
-pigeon-start -p 端口
+pigeon --help
 ```
