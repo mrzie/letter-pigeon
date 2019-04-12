@@ -1,18 +1,32 @@
 #!/usr/bin/env node
-const { argv } = process
+const { argsMatch } = require('./getArg')
+
+const exclusiveCommands = [
+    {
+        match: ['--help', '-h'],
+        handler: () => {
+            console.log('不要皮 =_=\n')
+        }
+    },
+    {
+        match: ['--version', '-v'],
+        handler: () => {
+            const packageJson = require('../package.json')
+            console.log(`当前版本：\n${packageJson.version}\n`)
+        }
+    },
+]
 
 const main = () => {
-    if (argv.includes('--help') || argv.includes('-h')) {
-        console.log('不要皮 =_=\n')
-    } else if (argv.includes('--version') || argv.includes('-v')) {
-        const packageJson = require('../package.json')
-        console.log(`当前版本：\n${packageJson.version}\n`)
-    } else {
-        require('./index')
-
-
-        checkVersion().catch(e => void (0))
+    for (const { match, handler } of exclusiveCommands) {
+        if (argsMatch(match)) {
+            handler()
+            return
+        }
     }
+
+    require('./index')
+    checkVersion().catch(e => void (0))
 }
 
 const checkVersion = async () => {
@@ -32,6 +46,5 @@ const checkVersion = async () => {
         console.log(msg)
     }
 }
-
 
 main()
