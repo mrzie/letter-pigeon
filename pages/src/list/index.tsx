@@ -72,7 +72,7 @@ const DocumentItem = (props: DocumentItemProps) => {
 
         return <div className={css.join(' ')}>
             <div className={styles.textItem}>
-                {msg.text}
+                {msg.text.split('\n').map((v, k) => <p key={k}>{v}</p>)}
             </div>
         </div>
     } else if (msg.msgType === 'img') {
