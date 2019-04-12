@@ -11,18 +11,14 @@ const main = () => {
         require('./index')
 
 
-        checkVersion().catch(e => void(0))
-
+        checkVersion().catch(e => void (0))
     }
 }
 
 const checkVersion = async () => {
-    const { getFileJSON, getRemoteJSON } = require('./getJSON')
-    const path = require('path')
-    const [local, remote] = await Promise.all([
-        getFileJSON(path.resolve(__dirname, '../package.json')),
-        getRemoteJSON('https://raw.githubusercontent.com/mrzie/letter-pigeon/master/package.json')
-    ])
+    const { getRemoteJSON } = require('./getJSON')
+    const local = require('../package.json')
+    const remote = await getRemoteJSON('https://raw.githubusercontent.com/mrzie/letter-pigeon/master/package.json')
 
     if (local.version && remote.version && local.version !== remote.version) {
         let msg = ''
