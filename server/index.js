@@ -21,6 +21,7 @@ app.use(route.all('/static/*', async ctx => {
 }))
 
 const session = {}
+const nextYear = () => (d => (d.setFullYear(d.getFullYear() + 1), d))(new Date())
 
 app.use(async (ctx, next) => {
     let cookieName = ctx.cookies.get('name')
@@ -28,7 +29,7 @@ app.use(async (ctx, next) => {
         const id = generateId()
         cookieName = `${sessionKey}.${id}`
         session[cookieName] = `设备${id}`
-        ctx.cookies.set('name', cookieName, {signed: true})
+        ctx.cookies.set('name', cookieName, { signed: true, expires: nextYear() })
     }
     await next()
 })
