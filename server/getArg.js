@@ -18,7 +18,6 @@ const getSomeArg = (...names) => {
     return false
 }
 
-
 const argsMatch = match => {
     if (match instanceof Array) {
         return argsMatch(v => match.includes(v))
@@ -32,10 +31,22 @@ const argsMatch = match => {
     return false
 }
 
-
+const commandMatch = match => {
+    if (!argv[2]) {
+        return false
+    }
+    if (match instanceof String) {
+        return match === argv[2]
+    }
+    if (match instanceof Array) {
+        return match.includes(argv[2])
+    }
+    return false
+}
 
 module.exports = {
     getArg,
     getSomeArg,
     argsMatch,
+    commandMatch,
 }
