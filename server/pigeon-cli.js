@@ -63,7 +63,7 @@ const exclusiveCommands = [
             console.log(msgs.join('\n'))
 
             require('child_process').execSync('npm install -g https://github.com/mrzie/letter-pigeon.git')
-            console.log("\n好了\n\n")
+            console.log("\n好了😎\n\n")
         }
     },
     {
@@ -95,7 +95,7 @@ const checkVersion = async () => {
 
     if (local && remote && local !== remote) {
         let msg = ''
-        msg += "\n\033[30m\033[47m有新版本\033[0m\n\n"
+        msg += "\n\033[30m\033[47m有新版本🤔\033[0m\n\n"
 
         msg += local + "  ->  \033[32m" + remote + "\033[0m\n\n"
 
