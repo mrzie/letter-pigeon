@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const basic = {
-    entry: ['./pages/src/index.tsx'],
+    entry: ['@babel/polyfill', './pages/src/index.tsx'],
     output: {
         path: path.resolve(__dirname, './pages/dist'),
         filename: 'main.js',
@@ -18,7 +18,7 @@ const basic = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: 'ts-loader',
+                use: ['babel-loader', 'ts-loader'],
                 exclude: /node_modules/,
             },
             {
