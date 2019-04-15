@@ -1,6 +1,6 @@
 {
   "name": "letter-pigeon",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,6 @@
   "devDependencies": {},
   "homepage": "https://github.com/mrzie/letter-pigeon#readme",
   "bin": {
-    "pigeon": "./server/pigeon-start.js"
+    "pigeon": "./server/pigeon-cli.js"
   }
 }
