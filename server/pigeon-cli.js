@@ -89,6 +89,10 @@ const main = () => {
     showHelp()
 }
 
+const updateCmd = process.platform === 'win32'
+    ? "npm install -g https://github.com/mrzie/letter-pigeon.git"
+    : "pigeon update"
+
 const checkVersion = async () => {
     const local = require('../package.json').version
     const remote = await getRemoteVersion()
@@ -99,7 +103,8 @@ const checkVersion = async () => {
 
         msg += local + "  ->  \033[32m" + remote + "\033[0m\n\n"
 
-        msg += "建议安装新版本： pigeon update"
+        msg += "建议安装新版本：\n"
+        msg += updateCmd;
 
 
         console.log(msg)
