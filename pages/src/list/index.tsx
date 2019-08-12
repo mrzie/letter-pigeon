@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { useContext, useRef, useEffect } from 'react'
+import { useContext, useRef, useEffect, useCallback } from 'react'
 import * as styles from './list.less'
-import { MessageType, Message, Document, TextDocument, ImgDocument } from '../model'
+import { TextDocument, ImgDocument } from '../model'
 import PigeonContext from '../context'
 import { useObservable, useEventHandler, useWhenLayout, useListener } from 'fugo';
-import { map, pairwise, filter, throttle, debounce, startWith, withLatestFrom } from 'rxjs/operators';
-import { fromEvent, merge } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { merge } from 'rxjs';
 
 const ListView = () => {
     const { state$ } = useContext(PigeonContext)
@@ -27,7 +27,10 @@ const ListView = () => {
 
     const [onCaptureLoad, captureLoad$] = useEventHandler()
     useEffect(() => {
-        document.addEventListener('load', onCaptureLoad, true)
+        document.addEventListener('load', onCaptureLoad, true);
+        return () => {
+            document.removeEventListener('load', onCaptureLoad, true);
+        };
     }, [])
 
     useListener(() => merge(scrollHeight$, captureLoad$).subscribe(() => {
@@ -39,14 +42,15 @@ const ListView = () => {
 
     return <div className={styles.container} ref={rootRef} >
         {
-            list.sort((a, b) => a.time > b.time ? 1 : -1).map((doc, index) => <DocumentItem
-                msg={doc.content}
-                from={doc.from.name}
-                isSelf={doc.from.name === selfName}
-                key={index}
-                isTemp={doc.isTemp}
-            />
-            )
+            list.sort((a, b) => a.time > b.time ? 1 : -1).map((doc, index) => (
+                <DocumentItem
+                    msg={doc.content}
+                    from={doc.from.name}
+                    isSelf={doc.from.name === selfName}
+                    key={index}
+                    isTemp={doc.isTemp}
+                />
+            ))
         }
     </div>
 }

@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { BehaviorSubject } from "rxjs";
-import { Message, Document } from "./model";
+import { Document } from "./model";
 
 export interface Terminal {
     name: string,
