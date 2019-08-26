@@ -1,86 +1,70 @@
-import { useBehaviorSubject, useListener } from "fugo"
-import PigeonContext, { PigeonContextType, Terminal } from "./context"
+import { useListener } from "fugo"
+import PigeonContext from "./context"
 import InputView from './input'
 import * as React from 'react'
 import ListView from "./list"
 import * as styles from './main.less'
-import { Message, Document, Operation } from "./model";
+import { Document, Operation } from "./model";
 import useWs from "./useWs";
 import { wsPath } from './config'
 import { skipUntil } from "rxjs/operators";
-import { useCallback, useMemo } from 'react'
-import { BehaviorSubject } from "rxjs";
-
-const reduceState = <T extends any>(
-    state$: BehaviorSubject<T>,
-    reducer: (state: T) => T
-) => {
-    console.log('do', reducer(state$.getValue()))
-    return state$.next(reducer(state$.getValue()))
-}
-
+import { useMemo } from 'react'
+import reduxContext from "./store";
+let count = 0
 
 const MainView = () => {
     const ws = useWs(wsPath)
 
-    const state$ = useBehaviorSubject({
-        list: [] as Document[],
-        terminal: null as Terminal,
-    })
+    const { state$, dispatch } = reduxContext.useReduxContext();
 
-    const context$ = useMemo(() => ({
-        state$,
-        send: msg => {
-            addMessageToList({
-                ...msg,
-                time: +new Date(),
-                isTemp: true,
-            })
-            ws.send(msg)
+    const ctx = useMemo(() => {
+        return {
+            send: (msg: Document) => {
+                const { terminal } = state$.getValue();
+                msg = {
+                    ...msg,
+                    from: {
+                        name: terminal && terminal.name,
+                        msgId: `${+new Date()}.${++count}`
+                    },
+                };
+                dispatch({
+                    type: 'ADD_MESSAGE_TO_LIST',
+                    doc: {
+                        ...msg,
+                        time: +new Date(),
+                        isTemp: true,
+                    },
+                });
+                ws.send(msg);
+            },
         }
-    }) as PigeonContextType, [])
-
-    const addMessageToList = useCallback((doc: Document) => reduceState(
-        state$,
-        state => ({
-            ...state,
-            list: [...state.list.filter(item => (item.from.name !== doc.from.name) || (item.from.msgId !== doc.from.msgId)), doc]
-        })
-    ), [])
-
-    const setTerminalName = useCallback((name: string) => reduceState(
-        state$,
-        state => ({
-            ...state,
-            terminal: { name }
-        })
-    ), [])
-
+    }, []);
 
     useListener(() => ws.message$.pipe(
         skipUntil(ws.open$)
     ).subscribe(msg => {
         if (msg.type === 'document') {
-            addMessageToList(msg as Document)
+            dispatch({
+                type: 'ADD_MESSAGE_TO_LIST',
+                doc: msg as Document,
+            });
+            return;
         }
         if (msg.type === 'operation') {
             const op = (msg as Operation)
             switch (op.name) {
                 case 'start':
-                    setTerminalName(op.terminalName)
-                    return
+                    dispatch({
+                        type: 'SET_TERMINAL_NAME',
+                        name: op.terminalName,
+                    });
+                    return;
             }
         }
-    }))
+    }));
 
-    useListener(() => state$.subscribe(value => {
-        console.log('context changed')
-        console.log(value)
-    }))
-
-    // const status$ = 
-
-    return <PigeonContext.Provider value={context$}>
+    return <PigeonContext.Provider value={ctx}>
         <div className={styles.container}>
             <ListView />
             <InputView />
@@ -88,4 +72,4 @@ const MainView = () => {
     </PigeonContext.Provider>
 }
 
-export default MainView;
+export default reduxContext.withProvider(MainView);

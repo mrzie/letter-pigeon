@@ -7,10 +7,6 @@ export interface Terminal {
 }
 
 export interface PigeonContextType {
-    state$: BehaviorSubject<{
-        list: Document[],
-        terminal: Terminal,
-    }>,
     send: (msg: Document) => void,
 }
 

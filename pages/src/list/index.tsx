@@ -1,26 +1,15 @@
 import * as React from 'react'
-import { useContext, useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, memo } from 'react'
 import * as styles from './list.less'
 import { TextDocument, ImgDocument } from '../model'
-import PigeonContext from '../context'
-import { useObservable, useEventHandler, useWhenLayout, useListener } from 'fugo';
-import { map } from 'rxjs/operators';
+import { useEventHandler, useWhenLayout, useListener } from 'fugo';
 import { merge } from 'rxjs';
+import { useList, useTerminal } from '../store';
 
 const ListView = () => {
-    const { state$ } = useContext(PigeonContext)
-    const list = useObservable(() => state$.pipe(
-        map(state => state.list)
-    ), [])
-    const selfName = useObservable(() => state$.pipe(
-        map(state => {
-            try {
-                return state.terminal.name
-            } catch (e) {
-                return null
-            }
-        })
-    ), null)
+    const list = useList();
+    const terminal = useTerminal();
+    const selfName = terminal ? terminal.name : null;
 
     const rootRef = useRef(null as HTMLDivElement)
     const scrollHeight$ = useWhenLayout(() => rootRef.current ? rootRef.current.scrollHeight : 0)
@@ -62,7 +51,7 @@ interface DocumentItemProps {
     isTemp: boolean,
 }
 
-const DocumentItem = (props: DocumentItemProps) => {
+const DocumentItem = memo((props: DocumentItemProps) => {
     const { msg, isSelf, isTemp } = props
     const css = [styles.item]
 
@@ -86,8 +75,8 @@ const DocumentItem = (props: DocumentItemProps) => {
             </div>
         </div>
     }
-    // const isSelf = 
+
     return null as null
-}
+})
 
 export default ListView
