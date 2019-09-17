@@ -50,6 +50,22 @@ const basic = {
                     }
                 ]
             },
+            {
+                test: /\.css$/,
+                use: [
+                    'css-hot-loader',
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: '../',
+                            // modules: true,
+                            // minimize: true,
+                        }
+                    },
+                    // 'style-loader',
+                    'css-loader',
+                ]
+            },
         ]
     },
 

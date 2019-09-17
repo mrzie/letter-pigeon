@@ -156,17 +156,17 @@ const readBase64 = (item: DataTransferItem) => readFile(item.getAsFile())
 const readFile = (f: File) => new Promise<string>(resolve => {
     const reader = new FileReader()
     reader.onloadend = (e: E) => {
-        resolve(e.target.result)
+        if (e.target.result instanceof ArrayBuffer) {
+            resolve(btoa([...new Uint8Array(e.target.result)].map(item => String.fromCharCode(item)).join('')));
+        } else {
+            resolve(e.target.result);
+        }
     }
     reader.readAsDataURL(f)
 })
 
-interface ET extends EventTarget {
-    result: string
-}
-
 interface E extends ProgressEvent {
-    target: ET
+    target: FileReader
 }
 
 export default InputView

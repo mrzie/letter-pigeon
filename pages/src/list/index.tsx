@@ -5,6 +5,7 @@ import { TextDocument, ImgDocument } from '../model'
 import { useEventHandler, useWhenLayout, useListener } from 'fugo';
 import { merge } from 'rxjs';
 import { useList, useTerminal } from '../store';
+import { Link } from 'react-router-dom';
 
 const ListView = () => {
     const list = useList();
@@ -33,6 +34,7 @@ const ListView = () => {
         {
             list.sort((a, b) => a.time > b.time ? 1 : -1).map((doc, index) => (
                 <DocumentItem
+                    index={index}
                     msg={doc.content}
                     from={doc.from.name}
                     isSelf={doc.from.name === selfName}
@@ -49,10 +51,45 @@ interface DocumentItemProps {
     isSelf: boolean,
     from: string,
     isTemp: boolean,
+    index: number,
+}
+
+const useBubbleContent = (msg: DocumentItemProps["msg"]) => {
+    if (msg.msgType === 'text') {
+
+        return (
+            <div className={styles.textItem}>
+                {msg.text.split('\n').map((v, k) => <div className={styles.p} key={k}>{v}</div>)}
+            </div>
+        );
+    } else if (msg.msgType === 'img') {
+        return (
+            <div className={styles.imageItem}>
+                <img src={msg.base64} />
+            </div>
+        );
+    }
+    return null;
+};
+
+const useTools = (msg: DocumentItemProps["msg"], index: number) => {
+    if (msg.msgType === "text") {
+
+        return (
+            <div className={styles.itemTools}>
+                <Link
+                    to={`/explorer/${index}`}
+                >
+                    <button className={styles.toolButton}>查看</button>
+                </Link>
+            </div>
+        );
+    }
+    return null;
 }
 
 const DocumentItem = memo((props: DocumentItemProps) => {
-    const { msg, isSelf, isTemp } = props
+    const { msg, isSelf, isTemp, index } = props
     const css = [styles.item]
 
     if (isSelf) {
@@ -61,22 +98,22 @@ const DocumentItem = memo((props: DocumentItemProps) => {
     if (isTemp) {
         css.push(styles.tempDoc)
     }
-    if (msg.msgType === 'text') {
 
-        return <div className={css.join(' ')}>
-            <div className={styles.textItem}>
-                {msg.text.split('\n').map((v, k) => <div className={styles.p} key={k}>{v}</div>)}
-            </div>
-        </div>
-    } else if (msg.msgType === 'img') {
-        return <div className={css.join(' ')}>
-            <div className={styles.imageItem}>
-                <img src={msg.base64} />
-            </div>
-        </div>
+
+    const content = useBubbleContent(msg);
+    if (!content) {
+        return null;
     }
 
-    return null as null
+    const toolsNode = useTools(msg, index);
+
+
+    return (
+        <div className={css.join(' ')}>
+            {toolsNode}
+            {content}
+        </div>
+    );
 })
 
 export default ListView

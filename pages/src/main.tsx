@@ -8,8 +8,11 @@ import { Document, Operation } from "./model";
 import useWs from "./useWs";
 import { wsPath } from './config'
 import { skipUntil } from "rxjs/operators";
-import { useMemo } from 'react'
+import { useMemo, memo } from 'react'
 import reduxContext from "./store";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
+import { ExplorerView } from "./explorer"
+
 let count = 0
 
 const MainView = () => {
@@ -65,11 +68,23 @@ const MainView = () => {
     }));
 
     return <PigeonContext.Provider value={ctx}>
-        <div className={styles.container}>
-            <ListView />
-            <InputView />
-        </div>
+        <Router>
+            <Home />
+            <Switch>
+                <Route
+                    path="/explorer/:id"
+                    render={props => <ExplorerView {...props} />}
+                />
+            </Switch>
+        </Router>
     </PigeonContext.Provider>
-}
+};
+
+const Home = memo(() => (
+    <div className={styles.container}>
+        <ListView />
+        <InputView />
+    </div>
+));
 
 export default reduxContext.withProvider(MainView);
