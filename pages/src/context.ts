@@ -1,16 +1,12 @@
 import { createContext } from "react";
 import { BehaviorSubject } from "rxjs";
-import { Message, Document } from "./model";
+import { Document } from "./model";
 
 export interface Terminal {
     name: string,
 }
 
 export interface PigeonContextType {
-    state$: BehaviorSubject<{
-        list: Document[],
-        terminal: Terminal,
-    }>,
     send: (msg: Document) => void,
 }
 

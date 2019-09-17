@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useCallback } from "react";
-import { useListener, useEventHandler } from "fugo";
-import { Message, MessageTypes, MsgType } from "./model";
+import { useEventHandler } from "fugo";
+import { Message, MessageTypes } from "./model";
 import { map, filter } from 'rxjs/operators'
 
 const useWs = (path: string) => {

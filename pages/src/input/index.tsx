@@ -2,28 +2,18 @@ import * as React from 'react'
 import { useContext, useCallback, useRef, useMemo } from 'react'
 import * as styles from './input.less'
 import PigeonContext from '../context'
-import { useObservable, useEventHandler, useListener } from 'fugo';
+import { useEventHandler, useListener } from 'fugo';
 import { pluck, tap, map, filter, mapTo, startWith, withLatestFrom } from 'rxjs/operators';
 import { fromEvent, merge, combineLatest } from 'rxjs';
-
-let count = 0
+import reduxContext, { useTerminal } from '../store';
 
 let inputCount = 0
 
 const InputView = () => {
-    const { state$, send } = useContext(PigeonContext)
+    const { send } = useContext(PigeonContext);
 
-    const terminalName$ = useMemo(() => state$.pipe(
-        map(state => {
-            try {
-                return state.terminal.name
-            } catch (e) {
-                return null
-            }
-        }),
-    ), [])
-
-    const terminalName = useObservable(() => terminalName$, null)
+    const terminal = useTerminal();
+    const terminalName = terminal ? terminal.name : null;
 
     const textRef = useRef(null as HTMLTextAreaElement)
 
@@ -70,7 +60,7 @@ const InputView = () => {
             submit$,
             cmdEnter$,
             ctrlEnter$
-        ).pipe(withLatestFrom(terminalName$)).subscribe(([, terminalName]) => {
+        ).subscribe(() => {
 
             try {
                 if (textRef.current.value.trim() === '') {
@@ -82,10 +72,7 @@ const InputView = () => {
                         msgType: 'text',
                         text: textRef.current.value,
                     },
-                    from: {
-                        name: terminalName,
-                        msgId: `${+new Date()}.${++count}`
-                    }
+                    from: null,
                 })
                 textRef.current.value = ''
             } catch (e) {
@@ -97,7 +84,7 @@ const InputView = () => {
     const [onParse, parse$] = useEventHandler<React.ClipboardEvent<HTMLTextAreaElement>>()
 
     // 粘贴上传
-    useListener(() => parse$.pipe(withLatestFrom(terminalName$)).subscribe(([e, terminalName]) => {
+    useListener(() => parse$.subscribe((e) => {
         const items = [...e.clipboardData.items]
         if (items.find(item => item.type.includes('image'))) {
             e.preventDefault()
@@ -108,16 +95,13 @@ const InputView = () => {
                         msgType: 'img',
                         base64: await readBase64(item)
                     },
-                    from: {
-                        name: terminalName,
-                        msgId: `${+new Date()}.${++count}`,
-                    }
+                    from: null,
                 })
             })
         }
     }))
     const [onFileChange, fileChange$] = useEventHandler<React.ChangeEvent<HTMLInputElement>>()
-    useListener(() => fileChange$.pipe(withLatestFrom(terminalName$)).subscribe(([e, terminalName]) => {
+    useListener(() => fileChange$.subscribe((e) => {
         const files = [...e.target.files]
         files.filter(f => f.type.includes('image')).forEach(async f => {
             send({
@@ -126,10 +110,7 @@ const InputView = () => {
                     msgType: 'img',
                     base64: await readFile(f)
                 },
-                from: {
-                    name: terminalName,
-                    msgId: `${+new Date()}.${++count}`,
-                }
+                from: null,
             })
         })
     }))
@@ -175,17 +156,17 @@ const readBase64 = (item: DataTransferItem) => readFile(item.getAsFile())
 const readFile = (f: File) => new Promise<string>(resolve => {
     const reader = new FileReader()
     reader.onloadend = (e: E) => {
-        resolve(e.target.result)
+        if (e.target.result instanceof ArrayBuffer) {
+            resolve(btoa([...new Uint8Array(e.target.result)].map(item => String.fromCharCode(item)).join('')));
+        } else {
+            resolve(e.target.result);
+        }
     }
     reader.readAsDataURL(f)
 })
 
-interface ET extends EventTarget {
-    result: string
-}
-
 interface E extends ProgressEvent {
-    target: ET
+    target: FileReader
 }
 
 export default InputView

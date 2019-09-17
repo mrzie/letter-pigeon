@@ -50,6 +50,22 @@ const basic = {
                     }
                 ]
             },
+            {
+                test: /\.css$/,
+                use: [
+                    'css-hot-loader',
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: '../',
+                            // modules: true,
+                            // minimize: true,
+                        }
+                    },
+                    // 'style-loader',
+                    'css-loader',
+                ]
+            },
         ]
     },
 
@@ -86,11 +102,15 @@ const dev = {
         port: 1573, //端口
         open: true, //自动打开页面
         hot: true,
-        contentBase: path.resolve(__dirname, '../pages/dist'),
-        openPage: 'static',
+        // contentBase: path.resolve(__dirname, '../pages/dist'),
+        // openPage: 'static',
         proxy: {
+            "/": {
+                target: "http://localhost:5387",
+                changeOrigin: true,
+            },
             '/ws': {
-                target: 'http://localhost:3000',
+                target: 'http://localhost:5387',
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {
