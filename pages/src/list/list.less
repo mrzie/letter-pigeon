@@ -3,7 +3,9 @@
 .container {
     .flex(1);
     .flex-container(column, flex-start, flex-start);
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 14px;
 }
 
 .item-tools {
@@ -14,12 +16,16 @@
     padding: 0 10px;
     flex-direction: row;
     bottom: 5px;
+    top: 5px;
+    align-items: flex-end;
+    justify-content: flex-start;
 }
 
 .from-self {
     .item-tools {
         left: auto;
         right: 100%;
+        justify-content: flex-end;
     }
 }
 
@@ -83,12 +89,14 @@
 }
 
 .text-item {
-    line-height: 1.2em;
+    line-height: 1.4em;
     min-height: 1em;
 
     .p {
         margin-block-start: .1em;
         margin-block-end: .1em;
+        // margin-block-start: 0;
+        // margin-block-end: 0;
         word-break: break-all;
     }
 

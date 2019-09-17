@@ -59,7 +59,7 @@ const useBubbleContent = (msg: DocumentItemProps["msg"]) => {
 
         return (
             <div className={styles.textItem}>
-                {msg.text.split('\n').map((v, k) => <div className={styles.p} key={k}>{v}</div>)}
+                {msg.text.split('\n').map(v => v.replace(/ /g, "\u00a0")).map((v, k) => <p className={styles.p} key={k}>{v}</p>)}
             </div>
         );
     } else if (msg.msgType === 'img') {

@@ -38,16 +38,16 @@ export const JSONExplorer = memo((props: JSONExplorerProps) => {
                     name: "javascript",
                     json: true,
                 },
-                readOnly: 'nocursor',
+                readOnly: true,
                 // lineWrapping: true,
-                theme: "solarized dark",
+                theme: "mdn-like",
                 autoCloseBrackets: true,
                 matchBrackets: true,
                 keyMap: 'sublime',
                 styleActiveLine: true,
                 extraKeys: { Enter: "newlineAndIndentContinueMarkdownList" },
                 foldGutter: true,
-                gutters: ["CodeMirror-linenumbers"],
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
             }}
         />
     )
