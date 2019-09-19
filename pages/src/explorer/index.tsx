@@ -3,6 +3,7 @@ import { RouteComponentProps } from "react-router";
 import { useList } from "../store";
 import { isJSON, JSONExplorer } from "./jsonExplorer";
 import * as styles from './explorer.less';
+import { buildJsonlikeGroups, GroupsExplorer } from "./groupsExplorer";
 
 export const ExplorerView = (props: RouteComponentProps<{ id: string }>) => {
     const content = useExplorerContent(props);
@@ -27,15 +28,27 @@ const useExplorerContent = (props: RouteComponentProps<{ id: string }>) => {
     }
 
     if (doc.content.msgType === "text") {
-        // if (isJSON(doc.content.text)) {
+        if (isJSON(doc.content.text)) {
+            return <JSONExplorer
+                value={doc.content.text}
+            />
+        }
+
+        const groupsValue = buildJsonlikeGroups(doc.content.text);
+        if (groupsValue && groupsValue.groups.length > 0) {
+            return <GroupsExplorer
+                index={+props.match.params.id}
+                value={groupsValue}
+            />
+        }
+
         return <JSONExplorer
             value={doc.content.text}
         />
-        // } else {
         // return <div className={styles.textBox}>
-        //         {doc.content.text}
+        //     {doc.content.text}
         // </div>
-        // }
+
     }
     return (
         <div>
