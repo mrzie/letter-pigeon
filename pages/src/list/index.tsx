@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { useRef, useEffect, memo } from 'react'
+import { useRef, useEffect, memo, useLayoutEffect, useState, useMemo } from 'react'
 import * as styles from './list.less'
-import { TextDocument, ImgDocument } from '../model'
+import { TextDocument, ImgDocument, MsgDocument } from '../model'
 import { useEventHandler, useWhenLayout, useListener } from 'fugo';
 import { merge } from 'rxjs';
 import { useList, useTerminal } from '../store';
 import { Link } from 'react-router-dom';
+import { isJSON } from '../explorer/jsonExplorer';
 
 const ListView = () => {
     const list = useList();
@@ -32,64 +33,49 @@ const ListView = () => {
 
     return <div className={styles.container} ref={rootRef} >
         {
-            list.sort((a, b) => a.time > b.time ? 1 : -1).map((doc, index) => (
-                <DocumentItem
-                    index={index}
-                    msg={doc.content}
-                    from={doc.from.name}
-                    isSelf={doc.from.name === selfName}
-                    key={index}
-                    isTemp={doc.isTemp}
-                />
-            ))
+            list.sort((a, b) => a.time > b.time ? 1 : -1).map((doc, index) => {
+                switch (doc.content.msgType) {
+                    case "text":
+                        return <TextDocumentItem
+                            index={index}
+                            msg={doc.content}
+                            isSelf={doc.from.name === selfName}
+                            key={index}
+                            isTemp={doc.isTemp}
+                        />;
+                    case "img":
+                        return <ImageDocumentItem
+                            index={index}
+                            msg={doc.content}
+                            isSelf={doc.from.name === selfName}
+                            key={index}
+                            isTemp={doc.isTemp}
+                        />
+                    default:
+                        return null;
+                }
+            })
         }
     </div>
 }
 
 interface DocumentItemProps {
-    msg: TextDocument | ImgDocument,
+    // msg: TextDocument | ImgDocument,
     isSelf: boolean,
-    from: string,
+    // from: string,
     isTemp: boolean,
     index: number,
 }
 
-const useBubbleContent = (msg: DocumentItemProps["msg"]) => {
-    if (msg.msgType === 'text') {
-
-        return (
-            <div className={styles.textItem}>
-                {msg.text.split('\n').map((v, k) => <div className={styles.p} key={k}>{v}</div>)}
-            </div>
-        );
-    } else if (msg.msgType === 'img') {
-        return (
-            <div className={styles.imageItem}>
-                <img src={msg.base64} />
-            </div>
-        );
-    }
-    return null;
-};
-
-const useTools = (msg: DocumentItemProps["msg"], index: number) => {
-    if (msg.msgType === "text") {
-
-        return (
-            <div className={styles.itemTools}>
-                <Link
-                    to={`/explorer/${index}`}
-                >
-                    <button className={styles.toolButton}>查看</button>
-                </Link>
-            </div>
-        );
-    }
-    return null;
+interface ImgDocumentItemProps extends DocumentItemProps {
+    msg: ImgDocument,
 }
 
-const DocumentItem = memo((props: DocumentItemProps) => {
-    const { msg, isSelf, isTemp, index } = props
+interface TextDocumentItemProps extends DocumentItemProps {
+    msg: TextDocument,
+}
+
+const useBubbleStyle = ({ isSelf, isTemp }: DocumentItemProps) => {
     const css = [styles.item]
 
     if (isSelf) {
@@ -98,22 +84,75 @@ const DocumentItem = memo((props: DocumentItemProps) => {
     if (isTemp) {
         css.push(styles.tempDoc)
     }
+    return css.join(' ');
+};
 
+const notEmpty = (...arr: any[]) => arr.some(some => !!some);
 
-    const content = useBubbleContent(msg);
-    if (!content) {
-        return null;
-    }
+const TextDocumentItem = memo((props: TextDocumentItemProps) => {
+    const { msg, index } = props
 
-    const toolsNode = useTools(msg, index);
+    const style = useBubbleStyle(props);
 
+    const [isOverflow, setIsOverflow] = useState(false);
+    const itemRef = useRef(null as HTMLDivElement);
+
+    useLayoutEffect(() => {
+        if (!itemRef.current) {
+            setIsOverflow(false);
+            return;
+        }
+        setIsOverflow(itemRef.current.scrollHeight > itemRef.current.clientHeight);
+    }, [msg.text]);
+
+    const isAnalyzable = useMemo(() => {
+        if (isJSON(msg.text)) {
+            return true;
+        }
+        return false;
+    }, [msg.text]);
+
+    const explorerButton = isAnalyzable || isOverflow
+        ? <Link to={`/explorer/${index}`}>
+            <button className={styles.toolButton}>{isOverflow ? "查看全部" : "查看"}</button>
+        </Link>
+        : null;
+
+    const toolsNode = notEmpty(explorerButton)
+        ? <div className={styles.itemTools}>
+            {explorerButton}
+        </div>
+        : null;
 
     return (
-        <div className={css.join(' ')}>
+        <div className={style}>
+            <div className={styles.textItem}>
+                <div className={styles.textItemContent} ref={itemRef}>
+                    {
+                        msg.text
+                            .split('\n')
+                            .map(v => v.replace(/ /g, "\u00a0"))
+                            .map((v, k) => <p className={styles.p} key={k}>{v}</p>)
+                    }
+                </div>
+            </div>
             {toolsNode}
-            {content}
         </div>
     );
-})
+});
+
+const ImageDocumentItem = memo((props: ImgDocumentItemProps) => {
+    const { msg, index } = props
+
+    const style = useBubbleStyle(props);
+
+    return (
+        <div className={style}>
+            <div className={styles.imageItem}>
+                <img src={msg.base64} />
+            </div>
+        </div>
+    );
+});
 
 export default ListView

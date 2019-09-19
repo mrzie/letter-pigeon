@@ -1,6 +1,6 @@
 export interface Document extends Message {
     type: 'document',
-    content: TextDocument | ImgDocument,
+    content: MsgDocument,
     from: TerminalInfo,
     isTemp?: boolean,
     time?:number,
@@ -14,6 +14,8 @@ export interface TerminalInfo {
 export enum MsgType {
 
 }
+
+export type MsgDocument = TextDocument | ImgDocument
 
 export interface TextDocument {
     msgType: 'text',

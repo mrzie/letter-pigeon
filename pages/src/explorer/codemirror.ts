@@ -11,6 +11,6 @@ import 'codemirror/addon/fold/foldgutter.css'
 import 'codemirror/addon/fold/markdown-fold'
 import 'codemirror/addon/fold/brace-fold'
 import 'codemirror/lib/codemirror.css'
-import 'codemirror/theme/solarized.css'
+import 'codemirror/theme/mdn-like.css'
 
 export default CodeMirror
